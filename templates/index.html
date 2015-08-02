@@ -1,0 +1,125 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link type="text/css" rel="stylesheet" href={% static 'css/style.css' %}>
+{#    <script src={% static 'js/script.js' %}></script>#}
+{#    <script src={% static 'js/bootstrap.min.js' %}></script>#}
+    <script src={% static 'js/jquery.min.js' %}></script>
+
+</head>
+<body>
+
+<script type="text/javascript">
+var second=500; //间隔时间5秒钟
+var kwnew="";
+var kwold="";
+var flagin=true;//用户输入内容更新标志，如果更新，那么发送请求，没有更新不发送请求，这么处理能减少发送次数，减少服务器压力！
+
+function ajaxFunction()
+{
+    kwnew=document.getElementById('kw').value;
+    var the_request_url='/index4/?kw='+kwnew;
+    var xmlHttp;
+
+    try {
+        xmlHttp = new XMLHttpRequest() ;
+    }
+    catch(e) {
+        try {
+            xmlHttp = new ActiveXObject("Msxml2.XMLHTTP");
+        }
+        catch(e) {
+            try {
+                xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            catch(e) {
+                alert("您的浏览器不支持ajax") ;
+                return false;
+            }
+        }
+    }
+
+    if(kwnew != "" && flagin==true){
+                    if(kwold != kwnew){
+                        kwold=kwnew;
+                        flagin=false;
+                    }
+                }
+    if(kwold && flagin==false){
+        flagin=true;
+
+        if (xmlHttp) {
+            xmlHttp.open('GET', the_request_url, true);
+            xmlHttp.onreadystatechange = function() {
+                if (xmlHttp.readyState ==4 ) {
+                    if (xmlHttp.status == 200 ) {
+                        var index4calback= xmlHttp.responseText;
+
+{#                        xmlHttp把views中dejson为str类型，将str转化为json类型，并获取list#}
+                        result=JSON.parse(index4calback).result;
+{#                        alert(result);#}
+{#                        alert(typeof(result));#}
+                        var keyword = "快乐";
+
+                        var data_key = new Array();
+                        var str_data_key= "";
+                        kwnew=document.getElementById('kw').value;
+                        for (var i = 0; i < result.length; i++) {
+                            data_key[i] = "<li data-key='" + result[i] + "class='bdsug-overflow'>" + keyword + "<b>" + result[i].slice(keyword.length) + "</b>";
+                            str_data_key = str_data_key + data_key[i];
+                            var listdiv = "<div class='bdsug' style='height: auto; display: block;'><ul>";
+                            var fouces = "<i class='c-icon c-icon-bear-round'></i>";
+                            var alllistdiv = listdiv + str_data_key;
+
+                            document.getElementById('vv').innerHTML = alllistdiv;
+                        }
+                    }
+                    else {
+                            document.getElementById('vv').innerHTML = "";
+                        }
+                }
+            };
+            xmlHttp.send(null);
+
+        } else {
+            alert('error');
+        }
+    }
+}
+
+</script>
+
+
+
+<div id="head">
+    <div class="head_wrapper">
+        <div class="s_from">
+            <div class="s_form_wrapper">
+                <div id="lg">
+                    <img src={% static 'images/bd_logo1.png' %} width="270", height="129" >
+                </div>
+                <form id="form" name="f" action="" class="fm">
+
+                    <span class="bg s_ipt_wr quickdelete-wrap" style="overflow: visible">
+                        <input id="kw" name="wd" class="s_ipt" value="" maxlength="255" autocomplete="off" onfocus="setInterval('ajaxFunction()',second)">
+                        <a href="" id="quickdelete" title="清空" class="quickdelete" style="top: 0px; right: 0px; display: none;"></a>
+
+{#                        动态显示#}
+                        <div id="vv"></div>
+
+
+
+                    </span>
+                    <span class="bg s_btn_wr">
+                        <input type="submit" id="su" value="百度一下" class="bg s_btn" >
+                    </span>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
